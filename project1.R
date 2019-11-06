@@ -81,34 +81,32 @@ cor.test(AL_08_17$R, AL_08_17$OPS)
 m <- lm(R ~ OPS, data = AL_08_17) # R = -694.9 + 1934.1 * OPS + e
 coef(m)
 
-confint(m)
-deviance(m)
+# (Intercept)         OPS 
+# -694.9175   1934.1498 
 
 # 회귀직선의 시각화
 plot(AL_08_17$OPS, AL_08_17$R)
 abline(m)
 
 summary(AL_08_17$OPS)
-# 신뢰구간
-pred <- data.frame(OPS = seq(0.6374, 0.8393, 0.001395))
-# p <- predict(m, newdata = pred, interval = "confidence")
-#p <- predict(m, interval = "confidence")
-predict(m, newdata = data.frame(OPS=0.7),interval = "confidence")
 
-p <- predict.lm(m, interval = "confidence")
-p
-length(AL_08_17$OPS)
-# 오차범위 그래프 
+# 신뢰구간 영역 산출 
+p <- predict(m, interval = "confidence")
+# 오차범위 폴리곤 그래프 
 x <- c(AL_08_17$OPS, rev(AL_08_17$OPS))
 y <- c(p[,'lwr'], rev(p[,'upr']))
-help(rev)
-help(c)
-help(predict)
-# y <- c(p[,'lwr'] )
-
-length(x)
-length(y)
 polygon(x,y,col = 'grey')
+
+
+
+
+
+
+
+
+
+
+
 
 
 
