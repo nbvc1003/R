@@ -72,12 +72,15 @@ AL_70_17$R
 AL_70_17$OPS
 cor.test(AL_70_17$R, AL_70_17$OPS)
 m <- lm(R ~ OPS, data = AL_70_17) 
-
+m1 <- lm(OPS ~ R, data = AL_70_17) 
 
 coef(m)
 # (Intercept)         OPS 
 # -713.4993   1957.9530 
 
+coef(m1)
+# (Intercept)            R 
+# 0.4652244697 0.0003725076 
 
 
 ## 회귀직선의 시각화 1 ------------------------------------
