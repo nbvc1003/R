@@ -15,13 +15,13 @@ model_OPS_R <- m1
 
 
 
-# AL리그 1970 ~ 2018년 팀정보 + 주요 수치 SLG, OBP , AVG, ISO 추가
-AL_70_18 <- Lahman::Teams %>% filter(lgID =='AL' & yearID >= 1970 & yearID <= 2018) %>% 
+# AL리그 1969 ~ 2018년 94년 제거 팀정보 + 주요 수치 SLG, OBP , AVG, ISO ,GPA 추가
+AL_69_18 <- Lahman::Teams %>% filter(lgID =='AL' & yearID >= 1969 & yearID <= 2018 & yearID != 1994) %>% 
   select(franchID, yearID, W,L,R,RA,AB,H,X2B,X3B,HR,BB,SO,SB,CS,HBP,SF,RA,ER,ERA,CG,SHO,SV,HA,HRA,BBA,SOA,E,DP,FP,attendance)  %>% 
-  mutate(SLG = (H + X2B + X3B *2 + HR*3 )/AB, OBP =(H+BB+HBP)/(AB+BB+HBP+SF) , AVG = H/AB, ISO = SLG-AVG, OPS = OBP + SLG)
+  mutate(SLG = (H + X2B + X3B *2 + HR*3 )/AB, OBP =(H+BB+HBP)/(AB+BB+HBP+SF) , AVG = H/AB, ISO = SLG-AVG, OPS = OBP + SLG ,GPA = (OPS*1.8 + SLG)/4)
 
 
-MLB_NY_TEAM_70_18 <- AL_70_18 %>% filter(franchID == 'NYY')
+MLB_NY_TEAM_69_18 <- AL_69_18 %>% filter(franchID == 'NYY')
 
 # 예상 승률 계산법 :  득점^2 / (득점^2 + 실점^2) 
 # R * 0.8164 = RA(실점) -> (0.6 승률달성시) 
@@ -31,18 +31,18 @@ MLB_NY_TEAM_70_18 <- AL_70_18 %>% filter(franchID == 'NYY')
 
 # NY팀의 실제 역사적인  R_OPS 상관의 검증 테스트 
 # 팀 OPS값으로 예측된 R값을 실제 R값과 비교
-testData <- data.frame(OPS = MLB_NY_TEAM_70_18$OPS)
+testData <- data.frame(OPS = MLB_NY_TEAM_69_18$OPS)
 pred <- predict(model_R_OPS, newdata = testData,interval = "confidence")
 pred
 summary(pred)
-View(MLB_NY_TEAM_70_18)
+View(MLB_NY_TEAM_69_18)
 # 예측 결과 
 # fit             lwr             upr       
 # Min.   :592.0   Min.   :584.6   Min.   :599.5  
-# 1st Qu.:691.7   1st Qu.:687.3   1st Qu.:696.0  
-# Median :791.9   Median :787.0   Median :796.8  
-# Mean   :770.5   Mean   :764.5   Mean   :776.4  
-# 3rd Qu.:845.7   3rd Qu.:839.0   3rd Qu.:852.4  
+# 1st Qu.:691.2   1st Qu.:686.9   1st Qu.:695.6  
+# Median :791.0   Median :786.1   Median :795.9  
+# Mean   :767.3   Mean   :761.4   Mean   :773.2  
+# 3rd Qu.:836.5   3rd Qu.:830.1   3rd Qu.:842.8  
 # Max.   :929.8   Max.   :919.8   Max.   :939.9 
 
 # 실제 값
@@ -57,11 +57,6 @@ View(MLB_NY_TEAM_70_18)
 testData <- data.frame(R = 820)
 pred <- predict(model_OPS_R , newdata = testData,interval = "confidence")
 summary(pred)
-plot(pred)
-
-# 
-#현재 선수들의 내년 예측 OPS ?
-
 
 
 ## 1 part
@@ -72,8 +67,6 @@ plot(pred)
 # 기존 모든 팀 데이터 통해서 R - OPS LM 값
 # 기존 모든 팀 데이터 통해서 OPS - SLG LM 값 
 
-## 3 part
-# OPS_SLG_OBP
 
 
  

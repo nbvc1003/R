@@ -18,12 +18,12 @@ sqrt(vif(model))
 # 2이하 이므로 다중공선성 문제 없음..
 
 
-AL_70_17$OPS
-AL_70_17$SLG
-AL_70_17$OBP
+AL_69_17$OPS
+AL_69_17$SLG
+AL_69_17$OBP
 
-cor.test(AL_70_17$OPS, AL_70_17$SLG) # 0.9718
-cor.test(AL_70_17$OPS, AL_70_17$OBP) # 0.8655
+cor.test(AL_69_17$OPS, AL_69_17$SLG) # 0.9718
+cor.test(AL_69_17$OPS, AL_69_17$OBP) # 0.8655
 
 
 
