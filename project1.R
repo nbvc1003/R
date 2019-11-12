@@ -7,6 +7,7 @@ library(ggplot2)
 getwd() # wd -> work directory 작업 폴더 경로조회
 setwd('e:/nbvc/R/work') # 작업 폴더를 바꿔준다. 
 
+# 81년, 94년 선수노조 파업으로 비정상적인인 데이터 있음..
 
 # 승수에 가장 많이 영향을 주는 스텟을 찾아라 
 # 10년치 모든 팀들의 승수와 스텟의 관계를 비교 한다. 
@@ -15,8 +16,8 @@ setwd('e:/nbvc/R/work') # 작업 폴더를 바꿔준다.
 # 팀별로 가장 큰영향을 주는 구간의 스텟을 찾는다. 
 
 View(Lahman::Teams)
-# AL리그 1969 ~ 2018년 94년제외팀정보 + 주요 수치 SLG, OBP , AVG, ISO, GPA 추가
-AL_69_17 <- Lahman::Teams %>% filter(lgID =='AL' & yearID >= 1969 & yearID <= 2018 & yearID != 1994) %>% 
+# AL리그 1969 ~ 2018년 94,81년제외팀정보 + 주요 수치 SLG, OBP , AVG, ISO, GPA 추가
+AL_69_17 <- Lahman::Teams %>% filter(lgID =='AL' & yearID >= 1969 & yearID <= 2018 & yearID != 1994 & yearID != 1981 ) %>% 
       select(yearID, W,L,R,AB,H,X2B,X3B,HR,BB,SO,SB,CS,HBP,SF,RA,ER,ERA,CG,SHO,SV,HA,HRA,BBA,SOA,E,DP,FP,attendance)  %>% 
     mutate(SLG = (H + X2B + X3B *2 + HR*3 )/AB, OBP =(H+BB+HBP)/(AB+BB+HBP+SF) , AVG = H/AB, ISO = SLG-AVG, OPS = OBP + SLG, GPA = (OPS*1.8 + SLG)/4)
 # HBP NA인 값 제거 
@@ -57,15 +58,15 @@ R_cor_top10_idx
 ## R과 의 상관관계 순위
 # R idx
 # 1  1.0000000   R
-# 2  0.9061876 OPS
-# 3  0.9006656 GPA
-# 4  0.8687689 SLG
-# 5  0.8274301   H
-# 6  0.8071450 OBP
-# 7  0.7512837 ISO
-# 8  0.7304097 AVG
-# 9  0.7283572 X2B
-# 10 0.7215563  HR
+# 2  0.9474796 OPS
+# 3  0.9392660 GPA
+# 4  0.8997706 SLG
+# 5  0.8614655 OBP
+# 6  0.7929450   H
+# 7  0.7802536 AVG
+# 8  0.7654419 ISO
+# 9  0.6952092  HR
+# 10 0.6769317 X2B
 
 
 
@@ -84,6 +85,11 @@ coef(m)
 coef(m1)
 # (Intercept)            R 
 # 0.4652244697 0.0003725076 
+
+#잔차테스트 
+library(mtest)
+dwtest(m)
+
 
 
 ## 회귀직선의 시각화 1 ------------------------------------
@@ -106,13 +112,16 @@ ggplot(AL_69_17, aes(x=OPS, y=R))+geom_point()+
 ## ---------------------------------------------------------------
 
 
+
+
+
 # 팀의 OPS 와 R 상관 계수 
 # 17년 팀 득점 값을 lm측정 모델에 대입 목표 R값이 되기 위함 OPS값 산출
 
 
 
 
-
+# 81년, 94년 선수노조 파업으로 비정상적인인 데이터 입력
 
 
 

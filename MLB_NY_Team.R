@@ -15,8 +15,8 @@ model_OPS_R <- m1
 
 
 
-# AL리그 1969 ~ 2018년 94년 제거 팀정보 + 주요 수치 SLG, OBP , AVG, ISO ,GPA 추가
-AL_69_18 <- Lahman::Teams %>% filter(lgID =='AL' & yearID >= 1969 & yearID <= 2018 & yearID != 1994) %>% 
+# AL리그 1969 ~ 2018년 94,81년 제거 팀정보 + 주요 수치 SLG, OBP , AVG, ISO ,GPA 추가
+AL_69_18 <- Lahman::Teams %>% filter(lgID =='AL' & yearID >= 1969 & yearID <= 2018 & yearID != 1994 & yearID != 1981) %>% 
   select(franchID, yearID, W,L,R,RA,AB,H,X2B,X3B,HR,BB,SO,SB,CS,HBP,SF,RA,ER,ERA,CG,SHO,SV,HA,HRA,BBA,SOA,E,DP,FP,attendance)  %>% 
   mutate(SLG = (H + X2B + X3B *2 + HR*3 )/AB, OBP =(H+BB+HBP)/(AB+BB+HBP+SF) , AVG = H/AB, ISO = SLG-AVG, OPS = OBP + SLG ,GPA = (OPS*1.8 + SLG)/4)
 
@@ -27,6 +27,32 @@ MLB_NY_TEAM_69_18 <- AL_69_18 %>% filter(franchID == 'NYY')
 # R * 0.8164 = RA(실점) -> (0.6 승률달성시) 
 # R : RA  -> 1 : 0.8164
 # RA -> 2018년도 NY 값으로 설정 
+
+#예상승률
+pWinRate <- function(R, RA){
+    
+    return (R^2 / (R^2 + RA^2))
+  }
+
+
+pWinRate(808,660)
+
+# 승율(EWA)와 실점(RA) 에 따른 목표 R 
+er_rwa <- function(EWA, RA){
+  ER = RA * sqrt(EWA/(1-EWA))
+  return (ER)
+}
+
+
+er_rwa(0.6, 669)
+
+needOPS <- function(R){
+  ops = 0.0003725076 * R + 0.4652244697
+  return (ops)
+}
+
+needOPS(820)
+
 
 
 # NY팀의 실제 역사적인  R_OPS 상관의 검증 테스트 
@@ -39,19 +65,21 @@ View(MLB_NY_TEAM_69_18)
 # 예측 결과 
 # fit             lwr             upr       
 # Min.   :592.0   Min.   :584.6   Min.   :599.5  
-# 1st Qu.:691.2   1st Qu.:686.9   1st Qu.:695.6  
-# Median :791.0   Median :786.1   Median :795.9  
-# Mean   :767.3   Mean   :761.4   Mean   :773.2  
-# 3rd Qu.:836.5   3rd Qu.:830.1   3rd Qu.:842.8  
-# Max.   :929.8   Max.   :919.8   Max.   :939.9 
+# 1st Qu.:693.8   1st Qu.:689.5   1st Qu.:698.1  
+# Median :791.9   Median :787.0   Median :796.8  
+# Mean   :768.9   Mean   :763.0   Mean   :774.8  
+# 3rd Qu.:839.5   3rd Qu.:833.1   3rd Qu.:846.0  
+# Max.   :929.8   Max.   :919.8   Max.   :939.9  
+# NA's   :1       NA's   :1       NA's   :1 
 
 # 실제 값
 # 968 ~ 421
 
 # 어느정도 부합한다. 
 
-# 17 NY RA: 669
-# 목표 R -> 669/R60 = 820
+# 18 NY RA: 669
+# 목표 R -> 820
+# NY 18 R -> 851 현재 초과달성중
 # 목표 OPS -> 0.7707
 # NY 18 OPS = 0.780 으로 이미 충족 
 testData <- data.frame(R = 820)

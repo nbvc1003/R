@@ -12,6 +12,7 @@ AgingOpsBatP <- Lahman::Batting
 birthYear <- Lahman::People %>% select (playerID, birthYear,finalGame,debut)
 #은퇴년도 추가
 birthYear$finalGame <- substr(birthYear$finalGame,1,4)
+View(birthYear$finalGame)
 #대뷰년도 추가 
 birthYear$debut <- substr(birthYear$debut,1,4)
 
