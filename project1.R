@@ -86,6 +86,7 @@ coef(m1)
 # (Intercept)            R 
 # 0.4652244697 0.0003725076 
 
+<<<<<<< HEAD
 #예측값 
 fitted(m)
 
@@ -101,6 +102,11 @@ confint(m)
 # OPS         1922.0426 2024.810
 
 
+=======
+#잔차테스트 
+library(mtest)
+dwtest(m)
+>>>>>>> 3ef2c92d15f5eb9a9b23df9473498e105ea5c7db
 
 
 
