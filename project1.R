@@ -15,11 +15,15 @@ setwd('e:/nbvc/R/work') # 작업 폴더를 바꿔준다.
 # 스텟별로 어느정도 구간에서 가장큰영향을 주는지 파악한다. 
 # 팀별로 가장 큰영향을 주는 구간의 스텟을 찾는다. 
 
+help(Lahman)
 View(Lahman::Teams)
+View(Lahman::LahmanData)
+
 # AL리그 1969 ~ 2018년 94,81년제외팀정보 + 주요 수치 SLG, OBP , AVG, ISO, GPA 추가
 AL_69_17 <- Lahman::Teams %>% filter(lgID =='AL' & yearID >= 1969 & yearID <= 2018 & yearID != 1994 & yearID != 1981 ) %>% 
-      select(yearID, W,L,R,AB,H,X2B,X3B,HR,BB,SO,SB,CS,HBP,SF,RA,ER,ERA,CG,SHO,SV,HA,HRA,BBA,SOA,E,DP,FP,attendance)  %>% 
-    mutate(SLG = (H + X2B + X3B *2 + HR*3 )/AB, OBP =(H+BB+HBP)/(AB+BB+HBP+SF) , AVG = H/AB, ISO = SLG-AVG, OPS = OBP + SLG, GPA = (OPS*1.8 + SLG)/4)
+      select(yearID, W,L,Rank, R,AB,H,X2B,X3B,HR,BB,SO,SB,CS,HBP,SF,RA,ER,ERA,CG,SHO,SV,HA,HRA,BBA,SOA,E,DP,FP,attendance,IPouts)  %>% 
+    mutate(SLG = (H + X2B + X3B *2 + HR*3 )/AB, OBP =(H+BB+HBP)/(AB+BB+HBP+SF),AVG = H/AB, ISO = SLG-AVG, OPS = OBP + SLG, GPA = (OPS*1.8 + SLG)/4,
+           Wrate = W/(W+L), OBA = HA/IPouts, WHIP = (HA+BBA)/(IPouts/3))
 # HBP NA인 값 제거 
 AL_69_17 <- AL_69_17%>% filter(HBP > 0)
 
@@ -69,6 +73,15 @@ R_cor_top10_idx
 # 10 0.6769317 X2B
 
 
+# Wrate 기준 상관관계 표
+Wrate_cor_top10_idx <-  df_cor_AL_69_17 %>% select(Wrate,idx) %>% arrange(desc(Wrate)) %>% head(20)
+Wrate_cor_top10_idx
+
+# attendance 기준 상관관계 표
+attendance_cor_top10_idx <-  df_cor_AL_69_17 %>% select(attendance,idx) %>% arrange(desc(attendance)) %>% head(20)
+attendance_cor_top10_idx
+
+
 
 # lm 선형 모델 
 View(AL_69_17)
@@ -86,7 +99,6 @@ coef(m1)
 # (Intercept)            R 
 # 0.4652244697 0.0003725076 
 
-
 #예측값 
 fitted(m)
 
@@ -100,7 +112,6 @@ confint(m)
 #                2.5 %   97.5 %
 #(Intercept) -753.7346 -677.867
 # OPS         1922.0426 2024.810
-
 
 
 
@@ -130,10 +141,9 @@ ggplot(AL_69_17, aes(x=OPS, y=R))+geom_point()+
 # 팀의 OPS 와 R 상관 계수 
 # 17년 팀 득점 값을 lm측정 모델에 대입 목표 R값이 되기 위함 OPS값 산출
 
-
-
-
 # 81년, 94년 선수노조 파업으로 비정상적인인 데이터 입력
+
+
 
 
 

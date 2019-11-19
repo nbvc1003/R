@@ -4,12 +4,17 @@ library(Lahman) # MLB data 패키지
 library(dplyr) # 
 library(corrplot) 
 library(ggplot2)
+library(reshape2)
 
 View(Lahman::Batting)
 View(Lahman::People)
 
 AgingOpsBatP <- Lahman::Batting
-birthYear <- Lahman::People %>% select (playerID, birthYear,finalGame,debut)
+birthYear <- Lahman::People %>% select (playerID, birthYear,finalGame,debut,nameFirst, nameLast)
+# 방송에서 사용하는 이름추가 
+birthYear$useName <-  paste(substr(birthYear$nameFirst,1,1),  birthYear$nameLast, sep='. ')
+View(birthYear)
+
 #은퇴년도 추가
 birthYear$finalGame <- substr(birthYear$finalGame,1,4)
 View(birthYear$finalGame)
@@ -47,6 +52,34 @@ cor_AgingOpsBatPBPlus70_AB502_AGE42cor <- cor(AgingOpsBatPBPlus70_AB502_AGE42cor
 corrplot(cor_AgingOpsBatPBPlus70_AB502_AGE42cor, method = "number")
 # OPS -> SLG -> HR > OBP > R    순 관련성 높음 
 # GPA 추가로 다시 검토 필요..
+
+##-------------------------------------------------------------------------------------------
+#selectedPlayersRecent <- dcast(selectedPlayers,playerID+nameGiven  ~ yearID, value.var = "OPS", mean  )
+
+# 최근3년 OPS 추이정보
+AgingOpsBatPBPlus_Recent <- AgingOpsBatPBPlus %>% filter(yearID >= 2016 & yearID <= 2018)
+AgingOpsBatPBPlus_Recent <- dcast(AgingOpsBatPBPlus_Recent,playerID+useName  ~ yearID, value.var = "OPS", mean  )
+View(AgingOpsBatPBPlus_Recent)
+
+# 기본 필터링 
+MLB18BatPBPlus <- AgingOpsBatPBPlus %>% filter(yearID == 2018 & teamID != 'NYA' & AGE < 34 & AB > 100) %>% select(playerID, OPS, yearID, teamID,SLG,GPA,AVG,ISO,AGE)
+# 포지션 정보 (Y2018PlayerPOS) 추가
+MLB18BatPBPlus <- merge(x=MLB18BatPBPlus, y=Y2018PlayerPOS, by='playerID',all.x = T)
+# 3년 정보 추가 
+MLB18BatPBPlus <- merge(x=MLB18BatPBPlus, y=AgingOpsBatPBPlus_Recent, by='playerID',all.x = T)
+View(MLB18BatPBPlus)
+
+# playerID 기준 중복 데이터 제거 
+MLB18BatPBPlus <- MLB18BatPBPlus[-which(duplicated(MLB18BatPBPlus$playerID)),]
+
+MLB18Bat_OF <- MLB18BatPBPlus%>% filter(POS =='OF' & AGE < 34) %>% arrange(desc(OPS)) %>% head(10)
+MLB18Bat_1B <- MLB18BatPBPlus%>% filter(POS =='1B' & AGE < 34)%>% arrange(desc(OPS)) %>% head(10)
+MLB18Bat_3B <- MLB18BatPBPlus%>% filter(POS =='3B' & AGE < 34)%>% arrange(desc(OPS)) %>% head(10)
+View(MLB18Bat_OF)
+View(MLB18Bat_1B)
+View(MLB18Bat_3B)
+
+
 
 ##-------------------------------------------------------------------------------------------
 # 나이별 그룹평균 OPS
@@ -117,7 +150,7 @@ ggplot(DAGE_OPS, aes(x=DAGE, y=mean_OPS))+geom_line()+ggtitle("대뷰나이/통�
 
 help(ggplot)
 
-
+##-------------------------------------------------------------------------------------------------------------------------
 
 
 
